@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jfeat.am.module.eavTest.services.domain.dao.QueryTestDao">
+                                                                                                                                <sql id="Base_Column_List">
+                                                                                                                                                                                                                                                                        eav_test.id, eav_test.name, eav_test.org_id AS orgId
+    </sql>
+
+        <sql id="QueryOwnedOrgIds">
+         SELECT children.id FROM t_sys_org, t_sys_org as children WHERE t_sys_org.left_num &lt;= children.left_num AND
+         t_sys_org.right_num >= children.left_num and t_sys_org.id=#{record.orgId} order by t_sys_org.node_level ASC
+    </sql>
+    
+    
+
+    <select id="queryMasterModel" resultType="TestModel">
+       SELECT eav_test.*
+       FROM eav_test
+       WHERE eav_test.id=#{id}
+       GROUP BY eav_test.id
+    </select>
+
+
+                
+    <select id="findTestPage" resultType="TestRecord" parameterType="TestRecord">
+            SELECT <include refid="Base_Column_List"/>
+
+        
+
+        FROM eav_test
+
+        
+                    <if test="record.orgId > 0">
+                ,(<include refid="QueryOwnedOrgIds"></include>) AS ownedOrgIds
+            </if>
+        
+        WHERE 1=1
+                <if test="record.orgId > 0">
+            AND eav_test.org_id = ownedOrgIds.id
+        </if>
+        
+
+        
+                                                                            <if test="record.id != null and record.id>0 ">
+                                    AND eav_test.id LIKE CONCAT('%',#{record.id},'%')
+                            </if>
+                                                                    <if test="record.name != null and record.name!= ''">
+                                    AND eav_test.name LIKE CONCAT('%',#{record.name},'%')
+                            </if>
+                                                                    
+
+                                                                                        <if test="record.orgId != null and record.orgId>0 ">
+                                    AND eav_test.org_id IN (<include refid="QueryOwnedOrgIds"/>)
+                            </if>
+        
+        <if test="startTime != null">
+            <![CDATA[AND eav_test.start_time >= DATE(#{startTime})]]>
+        </if>
+        <if test="endTime != null">
+            <![CDATA[AND eav_test.end_time <= DATE(#{endTime}]]>
+        </if>
+            <!--
+        <if test="search != null and search != ''">
+            OR eav_test.name LIKE CONCAT('%',#{search},'%')
+        </if>
+        -->
+                                    </select>
+</mapper>
