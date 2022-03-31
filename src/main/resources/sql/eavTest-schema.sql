@@ -13,5 +13,5 @@ create table eav_test
     primary key (id)
 ) engine=innodb;
 
-INSERT INTO `t_eav_entity` (`entity_name`, `table_name`, `org_id`, `org_tag`, `name`, `note`)
-VALUES ('Test', 'eav_test', '100000000000000010', NULL, '测试实体', NULL);
+INSERT INTO `t_eav_entity` (`entity_name`, `table_name`, `org_id`, `org_tag`, `name`, `note`,`entity_type`)
+VALUES ('Test', 'eav_test', '1', NULL, '测试实体', NULL,'EXPAND_FORM');
